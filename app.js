@@ -71,6 +71,21 @@ app.get('/borrowList', function (req, res) {
         res.redirect("/")
     }
 })
+app.get("/borrowDetail/:borrow_id",function(req,res){
+    sess=req.session
+    if(sess.user){
+        var sql="SELECT book_id,name,status from book where book_id IN (SELECT book_id FROM borrow_detail where borrow_id="+req.params.borrow_id+")"
+        libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
+            if (err) throw err  // ดัก error
+            res.render("borrow_detail", {
+                borrow_id:req.params.book_id,
+                results: results,
+                user: sess.user,
+                cart: sess.cart.length
+            })
+        })
+    }
+})
 app.post("/search", function (req, res) {
     console.log(req.body)
     sess = req.session
@@ -125,32 +140,41 @@ app.get("/addCart/:book_id", function (req, res) {
     res.redirect("/")
 })
 app.get("/checkOut", function (req, res) {
-    sess.req.session
+    sess=req.session
+    var cart=sess.cart
+    sess.cart = [] 
+    console.log(sess.cart)
     var date = new Date();
     console.log(date)
-    var sql = "INSERT INTO borrow_list (borrower_id, date,deadline,qty,status) VALUES ('" + sess.user + "','" + date + "','" + date + "'," + sess.cart.length + ",1)";
-    libDB.query(sql, function (err, result) {
-        if (err) throw err;
-        console.log("1 record inserted");
-        console.log(result.insertId)
-        var sql = "INSERT INTO borrow_detail (borrow_id, book_id,status) VALUES ?";
-        var values = []
-        sess.cart.forEach(function (book) {
-            var booksql = "UPDATE book SET status = 1 WHERE book_id = '" + book + "'";
-            libDB.query(booksql, function (err, result) {
-                if (err) throw err;
-                console.log(result.affectedRows + " record(s) updated");
-            });
-            // add book multivalue
-            values.push([result.insertId, book, 0])
-        })
-        libDB.query(sql, [values], function (err, result) {
+    if (cart.length != 0) {
+        var sql = "INSERT INTO borrow_list (borrower_id, date,deadline,qty,status) VALUES ('" + sess.user + "','" + date + "','" + date + "'," + cart.length + ",1)";
+        libDB.query(sql, function (err, result) {
             if (err) throw err;
-            console.log("Number of records inserted: " + result.affectedRows);
-            sess.cart=[] // destroy session 
-            res.redirect("/")
+            console.log("1 record inserted");
+            console.log(result.insertId)
+            var sql = "INSERT INTO borrow_detail (borrow_id, book_id,status) VALUES ?";
+            var values = []
+            cart.forEach(function (book) {
+                var booksql = "UPDATE book SET status = 1 WHERE book_id = '" + book + "'";
+                libDB.query(booksql, function (err, result) {
+                    if (err) throw err;
+                    console.log(result.affectedRows + " record(s) updated");
+                });
+                // add book multivalue
+                values.push([result.insertId, book, 0])
+            })
+            libDB.query(sql, [values], function (err, result) {
+                if (err) throw err;
+                console.log("Number of records inserted: " + result.affectedRows);
+                // destroy session  
+                console.log()
+                res.redirect("/")
+            });
         });
-    });
+    }else{
+        console.log("cart is empty ")
+        res.redirect("/")
+    }
 })
 app.get("/clearCart", function (req, res) {
     sess = req.session

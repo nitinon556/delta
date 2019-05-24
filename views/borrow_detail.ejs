@@ -4,24 +4,25 @@
     <!-- Nav tabs -->
     <% include ./partials/navbar%>
     <div class="container ">
-        <table class="table paginated">
+        <p><%=borrow_id%></p>
+        <table class="table ">
             <thead>
                 <tr>
-                    <th>borrow_id</th>
-                    <th>date</th>
-                    <th>dateline</th>
-                    <th>qty</th>
+                    <th>book_id</th>
+                    <th>book</th>
                     <th>status</th>
+                    <th>select</th>
                 </tr>
             </thead>
             <tbody>
                 <% results.forEach(function(result) { %>
                 <tr>
-                    <td><a href="/borrowDetail/<%=result.borrow_id%>" class="btn btn-primary btn-sm"><%= result.borrow_id %></a> </td>
-                    <td><%= result.date %></td>
-                    <td><%= result.deadline %></td>
-                    <td><%= result.qty %></td>
+                    <td><%= result.book_id %></td>
+                    <td><%= result.name %></td>
                     <td><%= result.status %></td>
+
+                    <td><input type="checkbox" name="" id=""></td>
+
                 </tr>
                 <% }); %>
             </tbody>
