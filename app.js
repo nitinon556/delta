@@ -58,7 +58,7 @@ app.get('/borrowList', function (req, res) {
     sess = req.session
     if (sess.user) {
         console.log(sess.cart)
-        var sql = 'SELECT * FROM borrow_list where borrower_id="' + sess.user + '" '  // คำสั่ง sql
+        var sql = 'SELECT * FROM borrow_list where borrower_id="' + sess.user + '" and qty!=0' // คำสั่ง sql
         libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
             if (err) throw err  // ดัก error
             res.render("borrow_list", {
@@ -71,20 +71,65 @@ app.get('/borrowList', function (req, res) {
         res.redirect("/")
     }
 })
-app.get("/borrowDetail/:borrow_id",function(req,res){
-    sess=req.session
-    if(sess.user){
-        var sql="SELECT book_id,name,status from book where book_id IN (SELECT book_id FROM borrow_detail where borrow_id="+req.params.borrow_id+")"
+app.get("/borrowDetail/:borrow_id", function (req, res) {
+    sess = req.session
+    if (sess.user) {
+        var sql = "SELECT book_id,name,status from book where book_id IN (SELECT book_id FROM borrow_detail where borrow_id=" + req.params.borrow_id + " and status=0)"
         libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
             if (err) throw err  // ดัก error
             res.render("borrow_detail", {
-                borrow_id:req.params.book_id,
+                borrow_id: req.params.borrow_id,
                 results: results,
                 user: sess.user,
                 cart: sess.cart.length
             })
         })
     }
+})
+app.post("/return/:borrow_id", function (req, res) {
+    console.log(req.params.borrow_id)
+    var listbook = []
+    if (!Array.isArray(req.body.book_id)) listbook.push(req.body.book_id)
+    else listbook = req.body.book_id
+    console.log(listbook)
+    var sql = "INSERT INTO return_list (borrow_id,borrower_id,return_date,qty,penalty) VALUES ('" + sess.user + "','" + req.params.borrow_id + "','" + Date + "'," + listbook.length + ",0)";
+    libDB.query(sql, function (err, result) {
+        if (err) throw err;
+        console.log("1 record inserted");
+
+        var reSql = "INSERT INTO return_detail (return_id, book_id) VALUES ?";
+        var values = []
+        listbook.forEach(function (book_id) {
+            values.push([result.insertId, book_id])
+        })
+
+        var booksql = "UPDATE book SET status = 0 WHERE book_id IN " + "("+listbook+")";
+        libDB.query(booksql, function (err, result) {
+            if (err) throw err;
+        });
+        var bLSsql = "UPDATE borrow_detail SET status = 1 WHERE borrow_id= " + req.params.borrow_id + " and book_id IN " + "("+listbook+")";
+        libDB.query(bLSsql, function (err, result) {
+            if (err) throw err;
+        });
+
+        var sql = "SELECT count(*) as count FROM borrow_detail WHERE borrow_id= " + req.params.borrow_id + " and status=0"  // คำสั่ง sql
+        libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
+            if (err) throw err  // ดัก error
+            var count = results[0].count
+            console.log("sssssssssssssssssssssssssssssssssssssss")
+            console.log(count)
+            var bLSsql = "UPDATE borrow_list SET qty = "+count+" WHERE borrow_id= " + req.params.borrow_id
+            libDB.query(bLSsql, function (err, result) {
+                if (err) throw err;
+            });
+        })
+
+        libDB.query(reSql, [values], function (err, result) {
+            if (err) throw err;
+            console.log("Number of records inserted: " + result.affectedRows);
+            res.redirect("/")
+        });
+    });
 })
 app.post("/search", function (req, res) {
     console.log(req.body)
@@ -140,10 +185,11 @@ app.get("/addCart/:book_id", function (req, res) {
     res.redirect("/")
 })
 app.get("/checkOut", function (req, res) {
-    sess=req.session
-    var cart=sess.cart
-    sess.cart = [] 
+    sess = req.session
+    var cart = sess.cart
+    sess.cart = []
     console.log(sess.cart)
+    // date problem
     var date = new Date();
     console.log(date)
     if (cart.length != 0) {
@@ -171,7 +217,7 @@ app.get("/checkOut", function (req, res) {
                 res.redirect("/")
             });
         });
-    }else{
+    } else {
         console.log("cart is empty ")
         res.redirect("/")
     }

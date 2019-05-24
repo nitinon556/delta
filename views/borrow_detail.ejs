@@ -4,30 +4,30 @@
     <!-- Nav tabs -->
     <% include ./partials/navbar%>
     <div class="container ">
-        <p><%=borrow_id%></p>
-        <table class="table ">
-            <thead>
-                <tr>
-                    <th>book_id</th>
-                    <th>book</th>
-                    <th>status</th>
-                    <th>select</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% results.forEach(function(result) { %>
-                <tr>
-                    <td><%= result.book_id %></td>
-                    <td><%= result.name %></td>
-                    <td><%= result.status %></td>
-
-                    <td><input type="checkbox" name="" id=""></td>
-
-                </tr>
-                <% }); %>
-            </tbody>
-        </table>
-
+        <p>borrow id: <%=borrow_id%></p>
+        <form action="/return/<%=borrow_id%>" method="POST">
+            <table class="table ">
+                <thead>
+                    <tr>
+                        <th>book_id</th>
+                        <th>book</th>
+                        <th>status</th>
+                        <th>select</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% results.forEach(function(result) { %>
+                    <tr>
+                        <td><%= result.book_id %></td>
+                        <td><%= result.name %></td>
+                        <td><%= result.status %></td>
+                        <td><input type="checkbox" name="book_id" value="<%=result.book_id%>"></td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+            <input type="submit" value="return">
+        </form>
     </div>
 </body>
 
