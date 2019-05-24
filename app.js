@@ -37,6 +37,7 @@ app.get('/', function(req, res) {   // Router เวลาเรียกใช�
 })
 app.post("/login",function(req,res){
     sess=req.session
+    sess.cart=[]
     let sql = 'SELECT password FROM student where student_id="' +req.body.username+'" ' //sql query 
     let query = db2.query(sql, function(err, results) {
         var user=results[0]
@@ -70,7 +71,9 @@ app.get('/home',function(req,res){
         if (err) throw err  // ดัก error
         var a=results
         res.render("index",{
-            results:results
+            results:results,
+            user:sess.user,
+            cart:sess.cart.length
         })
     })
     }else{
@@ -79,14 +82,32 @@ app.get('/home',function(req,res){
 })
 app.post("/search",function(req,res){
     console.log(req.body)
+    sess=req.session
     let sql = 'SELECT * FROM book where '+req.body.searchOp+' LIKE "%'+req.body.keyword+'%"'  // คำสั่ง sql
     let query = db.query(sql, function(err, results) { // สั่ง Query คำสั่ง sql
         if (err) throw err  // ดัก error
         var a=results
         res.render("index",{
-            results:results
+            results:results,
+            user:sess.user,
+            cart:sess.cart.length
         })
     })
+})
+app.get("/addCart/:book_id",function(req,res){
+    sess=req.session
+    if(!sess.cart.includes(req.params.book_id)){
+        sess.cart.push(req.params.book_id)
+        console.log(sess.cart)
+    }else{
+        console.log("duplicated")
+    }
+    res.redirect("/")
+})
+app.get("/clearCart",function(req,res){
+    sess=req.session
+    sess.cart=[]
+    res.redirect("/")
 })
 app.listen('3000', () => {     // 
     console.log('start port 3000')

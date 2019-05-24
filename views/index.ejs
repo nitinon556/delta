@@ -2,20 +2,23 @@
 
 <body>
     <!-- Nav tabs -->
-    <nav class="navbar navbar-expand-sm bg-dark">
-
+    <nav class="navbar navbar-expand-sm navbar-dark bg-success">
         <!-- Links -->
-        <ul class="navbar-nav">
+        <ul class="navbar-nav navbar-left">
             <li class="nav-item">
-                <a href="#tab1Id" class="nav-link ">Delta library</a>
+                <a href="/" class="navbar-brand ">Delta library</a>
             </li>
-
+            <li class="nav-item">
+                <a href="/" class="nav-link">username: <%=user.username%></a>
+            </li>
+            <li class="nav-item">
+                <a href="/clearCart" class="nav-link">cart <span class="badge badge-warning"><%=cart%></span></a>
+            </li>
             <li class="nav-item">
                 <a href="/logout" class="btn btn-danger">Logout</a>
             </li>
-        </ul>
-
     </nav>
+
     <div class="container ">
         <form action="/search" method="POST">
             <select name="searchOp">
@@ -23,7 +26,7 @@
                 <option value="category">ประเภท</option>
                 <option value="author">ผู้แต่ง</option>
             </select>
-            <input type="text" name="keyword"> 
+            <input type="text" name="keyword">
             <input type="submit" class="btn btn-primary" value="search">
         </form>
         <table class="table paginated">
@@ -45,7 +48,7 @@
                     <td><%= result.author %></td>
                     <td><%= result.year_publish %></td>
                     <td><a href="" class="btn btn-primary btn-sm">more</a></td>
-                    <td><a href="" class="btn btn-success btn-sm">Add</a></td>
+                    <td><a href="/addCart/<%=result.book_id%>" class="btn btn-success btn-sm">Add</a></td>
                 </tr>
                 <% }); %>
             </tbody>
