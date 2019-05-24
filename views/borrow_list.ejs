@@ -1,0 +1,35 @@
+<% include ./partials/header%>
+
+<body>
+    <!-- Nav tabs -->
+    <% include ./partials/navbar%>
+    <div class="container ">
+        <table class="table paginated">
+            <thead>
+                <tr>
+                    <th>borrow_id</th>
+                    <th>date</th>
+                    <th>dateline</th>
+                    <th>qty</th>
+                    <th>status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% results.forEach(function(result) { %>
+                <tr>
+                    <td><a href="" class="btn btn-primary btn-sm"><%= result.borrow_id %></a> </td>
+                    <td><%= result.date %></td>
+                    <td><%= result.deadline %></td>
+                    <td><%= result.qty %></td>
+                    <td><%= result.status %></td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
+    </div>
+</body>
+
+</html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script src="/static/sc.js"></script>
