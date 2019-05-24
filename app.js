@@ -69,7 +69,6 @@ app.get('/home',function(req,res){
     let query = db.query(sql, function(err, results) { // สั่ง Query คำสั่ง sql
         if (err) throw err  // ดัก error
         var a=results
-        console.log(sess.user)
         res.render("index",{
             results:results
         })
@@ -77,6 +76,17 @@ app.get('/home',function(req,res){
     }else{
         res.redirect("/")
     }
+})
+app.post("/search",function(req,res){
+    console.log(req.body)
+    let sql = 'SELECT * FROM book where '+req.body.searchOp+' LIKE "%'+req.body.keyword+'%"'  // คำสั่ง sql
+    let query = db.query(sql, function(err, results) { // สั่ง Query คำสั่ง sql
+        if (err) throw err  // ดัก error
+        var a=results
+        res.render("index",{
+            results:results
+        })
+    })
 })
 app.listen('3000', () => {     // 
     console.log('start port 3000')

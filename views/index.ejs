@@ -17,41 +17,43 @@
 
     </nav>
     <div class="container ">
-            <div>
-                   
-                            <select >  
-                                    <option value="1">ชื่อหนังสือ</option>
-                                    <option value="2">ประเภท</option>
-                                    <option value="3">ผู้แต่ง</option>
-                            </select>
-                            
-                    <input type="text"> <button>search</button>
-            </div>
-            <table class="table paginated">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Category</th>
-                                    <th>Author</th>
-                                    <th>YearPublish</th>
-                    
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% results.forEach(function(result) { %>
-                                <tr>
-                                        <td class="text-danger"><%= result.name %> </td>
-                                        <td><%= result.category %></td>
-                                        <td><%= result.author %></td>
-                                        <td><%= result.year_publish %></td>
-                                    </tr>
-                                <% }); %>
-                                
-                            </tbody>
-                        </table>
-                            
-        </div>
-        </body>
-    </html>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-    <script src="/static/sc.js"></script>
+        <form action="/search" method="POST">
+            <select name="searchOp">
+                <option value="name">ชื่อหนังสือ</option>
+                <option value="category">ประเภท</option>
+                <option value="author">ผู้แต่ง</option>
+            </select>
+            <input type="text" name="keyword"> 
+            <input type="submit" class="btn btn-primary" value="search">
+        </form>
+        <table class="table paginated">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Author</th>
+                    <th>YearPublish</th>
+                    <th>Detail</th>
+                    <th>Add</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% results.forEach(function(result) { %>
+                <tr>
+                    <td class="text-danger"><%= result.name %> </td>
+                    <td><%= result.category %></td>
+                    <td><%= result.author %></td>
+                    <td><%= result.year_publish %></td>
+                    <td><a href="" class="btn btn-primary btn-sm">more</a></td>
+                    <td><a href="" class="btn btn-success btn-sm">Add</a></td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
+    </div>
+</body>
+
+</html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script src="/static/sc.js"></script>

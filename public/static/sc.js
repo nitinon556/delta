@@ -20,5 +20,5 @@ $('table.paginated').each(function() {
             $(this).addClass('active').siblings().removeClass('active');
         }).appendTo($pager).addClass('clickable');
     }
-    $pager.insertBefore($table).find('span.page-number:first').addClass('active');
+    $pager.insertAfter($table).find('span.page-number:first').addClass('active');
 });
