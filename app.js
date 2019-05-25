@@ -91,7 +91,7 @@ app.get('/returnList', function (req, res) {
     sess = req.session
     if (sess.user) {
         console.log(sess.cart)
-        var sql = 'SELECT * FROM return_list where borrower_id="' + sess.user+'"'// คำสั่ง sql
+        var sql = 'SELECT * FROM return_list where borrower_id="' + sess.user + '"'// คำสั่ง sql
         libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
             console.log(results)
             if (err) throw err  // ดัก error
@@ -108,7 +108,7 @@ app.get('/returnList', function (req, res) {
 app.get("/returnDetail/:return_id", function (req, res) {
     sess = req.session
     if (sess.user) {
-        var sql = "SELECT book_id,name,status from book where book_id IN (SELECT book_id FROM return_detail where return_id=" + req.params.return_id +")"
+        var sql = "SELECT book_id,name,status from book where book_id IN (SELECT book_id FROM return_detail where return_id=" + req.params.return_id + ")"
         libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
             if (err) throw err  // ดัก error
             res.render("return_detail", {
@@ -121,12 +121,15 @@ app.get("/returnDetail/:return_id", function (req, res) {
     }
 })
 app.post("/return/:borrow_id", function (req, res) {
+    sess = req.session
     console.log(req.params.borrow_id)
     var listbook = []
     if (!Array.isArray(req.body.book_id)) listbook.push(req.body.book_id)
     else listbook = req.body.book_id
     console.log(listbook)
-    var sql = "INSERT INTO return_list (borrow_id,borrower_id,return_date,qty,penalty) VALUES ('" + req.params.borrow_id + "','" +sess.user+ "','" + Date + "'," + listbook.length + ",0)";
+    var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    var sql = "INSERT INTO return_list (borrow_id,borrower_id,return_date,qty,penalty) VALUES ('" + req.params.borrow_id + "','" + sess.user + "','" + date + "'," + listbook.length + ",0)";
     libDB.query(sql, function (err, result) {
         if (err) throw err;
         console.log("1 record inserted");
@@ -137,24 +140,37 @@ app.post("/return/:borrow_id", function (req, res) {
             values.push([result.insertId, book_id])
         })
 
-        var booksql = "UPDATE book SET status = 0 WHERE book_id IN " + "("+listbook+")";
+        var booksql = "UPDATE book SET status = 0 WHERE book_id IN " + "(" + listbook + ")";
         libDB.query(booksql, function (err, result) {
             if (err) throw err;
         });
-        var bLSsql = "UPDATE borrow_detail SET status = 1 WHERE borrow_id= " + req.params.borrow_id + " and book_id IN " + "("+listbook+")";
+        var bLSsql = "UPDATE borrow_detail SET status = 1 WHERE borrow_id= " + req.params.borrow_id + " and book_id IN " + "(" + listbook + ")";
         libDB.query(bLSsql, function (err, result) {
             if (err) throw err;
         });
 
+
+        // update status blaaq  qqq
         var sql = "SELECT count(*) as count FROM borrow_detail WHERE borrow_id= " + req.params.borrow_id + " and status=0"  // คำสั่ง sql
         libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
             if (err) throw err  // ดัก error
             var count = results[0].count
-            console.log("sssssssssssssssssssssssssssssssssssssss")
-            console.log(count)
-            var bLSsql = "UPDATE borrow_list SET qty = "+count+" WHERE borrow_id= " + req.params.borrow_id
+            var bLSsql = "UPDATE borrow_list SET qty = " + count + " WHERE borrow_id= " + req.params.borrow_id
             libDB.query(bLSsql, function (err, result) {
                 if (err) throw err;
+                var sql = "SELECT SUM(qty) as sum FROM borrow_list where borrower_id='" + sess.user + "'"
+                libDB.query(sql, function (err, results) {
+                    if (err) throw err;
+                    var sum = results[0].sum
+                    console.log(sum)
+                    if (sum == 0) {
+                        var sql = "UPDATE student SET status = 0 where student_id='" + sess.user + "'" //sql query 
+                        libDB.query(sql, function (err, result) {
+                            if (err) throw err;
+                            console.log(result)
+                        });
+                    }
+                });
             });
         })
 
@@ -224,10 +240,13 @@ app.get("/checkOut", function (req, res) {
     sess.cart = []
     console.log(sess.cart)
     // date problem
-    var date = new Date();
+    var objDate = new Date()
+    var date = objDate.toISOString().slice(0, 19).replace('T', ' ');
+    objDate.setDate(objDate.getDate() + 7)
+    var deadline = objDate.toISOString().slice(0, 19).replace('T', ' ');
     console.log(date)
     if (cart.length != 0) {
-        var sql = "INSERT INTO borrow_list (borrower_id, date,deadline,qty,status) VALUES ('" + sess.user + "','" + date + "','" + date + "'," + cart.length + ",1)";
+        var sql = "INSERT INTO borrow_list (borrower_id, date,deadline,qty,status) VALUES ('" + sess.user + "','" + date + "','" + deadline + "'," + cart.length + ",1)";
         libDB.query(sql, function (err, result) {
             if (err) throw err;
             console.log("1 record inserted");
@@ -238,18 +257,23 @@ app.get("/checkOut", function (req, res) {
                 var booksql = "UPDATE book SET status = 1 WHERE book_id = '" + book + "'";
                 libDB.query(booksql, function (err, result) {
                     if (err) throw err;
-                    console.log(result.affectedRows + " record(s) updated");
                 });
                 // add book multivalue
                 values.push([result.insertId, book, 0])
             })
+            var stdSql = "UPDATE student SET status = 1 where student_id='" + sess.user + "'" //sql query 
+            libDB.query(stdSql, function (err, result) {
+                if (err) throw err;
+                console.log(result)
+            });
             libDB.query(sql, [values], function (err, result) {
                 if (err) throw err;
-                console.log("Number of records inserted: " + result.affectedRows);
                 // destroy session  
                 console.log()
                 res.redirect("/")
             });
+
+
         });
     } else {
         console.log("cart is empty ")

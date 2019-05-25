@@ -35,5 +35,5 @@ div.pager span {
 }
 
 div.pager span.active {
-    background: #c00;
+    background: rgb(255, 153, 0);
 }
