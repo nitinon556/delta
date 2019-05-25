@@ -129,7 +129,7 @@ app.post("/return/:borrow_id", function (req, res) {
     console.log(listbook)
     var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-    var sql = "INSERT INTO return_list (borrow_id,borrower_id,return_date,qty,penalty) VALUES ('" + req.params.borrow_id + "','" + sess.user + "','" + date + "'," + listbook.length + ",0)";
+    var sql = "INSERT INTO return_list (borrow_id,borrower_id,return_date,qty) VALUES ('" + req.params.borrow_id + "','" + sess.user + "','" + date + "'," + listbook.length + ")";
     libDB.query(sql, function (err, result) {
         if (err) throw err;
         console.log("1 record inserted");
