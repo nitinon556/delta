@@ -3,16 +3,19 @@
 <body>
     <!-- Nav tabs -->
     <% include ./partials/navbar%>
-    <div class="container ">
-        <form action="/search" method="POST">
-            <select name="searchOp">
-                <option value="name">ชื่อหนังสือ</option>
-                <option value="category">ประเภท</option>
-                <option value="author">ผู้แต่ง</option>
-            </select>
-            <input type="text" name="keyword">
-            <input type="submit" class="btn btn-primary" value="search">
-        </form>
+    <div class="container">
+        <div class = "row d-flex justify-content-center">
+                <form action="/search" method="POST">
+                    <select name="searchOp">
+                        <option value="name">ชื่อหนังสือ</option>
+                        <option value="category">ประเภท</option>
+                        <option value="author">ผู้แต่ง</option>
+                    </select>
+                    <input type="text" name="keyword">
+                    <input type="submit" class="btn btn-primary" value="search">
+                </form>
+        </div>
+       
         <table class="table paginated">
             <thead>
                 <tr>
