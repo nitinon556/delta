@@ -86,13 +86,47 @@ app.get("/borrowDetail/:borrow_id", function (req, res) {
         })
     }
 })
+// ----------------------------------about return-----------------------------------------------
+app.get('/returnList', function (req, res) {
+    sess = req.session
+    if (sess.user) {
+        console.log(sess.cart)
+        var sql = 'SELECT * FROM return_list where borrower_id="' + sess.user+'"'// คำสั่ง sql
+        libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
+            console.log(results)
+            if (err) throw err  // ดัก error
+            res.render("return_list", {
+                results: results,
+                user: sess.user,
+                cart: sess.cart.length
+            })
+        })
+    } else {
+        res.redirect("/")
+    }
+})
+app.get("/returnDetail/:return_id", function (req, res) {
+    sess = req.session
+    if (sess.user) {
+        var sql = "SELECT book_id,name,status from book where book_id IN (SELECT book_id FROM return_detail where return_id=" + req.params.borrow_id +")"
+        libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
+            if (err) throw err  // ดัก error
+            res.render("return_detail", {
+                return_id: req.params.return_id,
+                results: results,
+                user: sess.user,
+                cart: sess.cart.length
+            })
+        })
+    }
+})
 app.post("/return/:borrow_id", function (req, res) {
     console.log(req.params.borrow_id)
     var listbook = []
     if (!Array.isArray(req.body.book_id)) listbook.push(req.body.book_id)
     else listbook = req.body.book_id
     console.log(listbook)
-    var sql = "INSERT INTO return_list (borrow_id,borrower_id,return_date,qty,penalty) VALUES ('" + sess.user + "','" + req.params.borrow_id + "','" + Date + "'," + listbook.length + ",0)";
+    var sql = "INSERT INTO return_list (borrow_id,borrower_id,return_date,qty,penalty) VALUES ('" + req.params.borrow_id + "','" +sess.user+ "','" + Date + "'," + listbook.length + ",0)";
     libDB.query(sql, function (err, result) {
         if (err) throw err;
         console.log("1 record inserted");
