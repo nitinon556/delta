@@ -32,7 +32,7 @@ app.get('/', function (req, res) {   // Router เวลาเรียกใช
     if (sess.user) {
         res.redirect("/home") //if login
     } else {
-        res.render("home")
+        res.render("login")
     }
 })
 app.get('/home', function (req, res) {
