@@ -58,7 +58,7 @@ app.get('/borrowList', function (req, res) {
     sess = req.session
     if (sess.user) {
         console.log(sess.cart)
-        var sql = 'SELECT * FROM borrow_list where borrower_id="' + sess.user + '" and qty!=0' // คำสั่ง sql
+        var sql = 'SELECT * FROM borrow_list where borrower_id="' + sess.user + '" and qty!=0 order by borrow_id desc' // คำสั่ง sql
         libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
             if (err) throw err  // ดัก error
             res.render("borrow_list", {
@@ -91,7 +91,7 @@ app.get('/returnList', function (req, res) {
     sess = req.session
     if (sess.user) {
         console.log(sess.cart)
-        var sql = 'SELECT * FROM return_list where borrower_id="' + sess.user + '"'// คำสั่ง sql
+        var sql = 'SELECT * FROM return_list where borrower_id="' + sess.user + '" order by return_id desc'// คำสั่ง sql
         libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
             console.log(results)
             if (err) throw err  // ดัก error
@@ -225,6 +225,24 @@ app.get("/logout", function (req, res) {
     })
 })
 // -------------------------about cart ---------------------------------
+app.get('/cart', function (req, res) {
+    sess = req.session
+    if (sess.user&&sess.cart.length!=0) {
+        console.log(sess.cart)
+        var sql = "SELECT * FROM book where book_id IN "+ "(" + sess.cart + ")";
+        libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
+            if (err) throw err  // ดัก error
+            res.render("cart", {
+                results: results,
+                user: sess.user,
+                cart: sess.cart.length
+            })
+        })
+    } else {
+        res.redirect("/")
+    }
+})
+
 app.get("/addCart/:book_id", function (req, res) {
     sess = req.session
     if (!sess.cart.includes(req.params.book_id)) {
@@ -246,7 +264,7 @@ app.get("/checkOut", function (req, res) {
     var deadline = objDate.toISOString().slice(0, 19).replace('T', ' ');
     console.log(date)
     if (cart.length != 0) {
-        var sql = "INSERT INTO borrow_list (borrower_id, date,deadline,qty,status) VALUES ('" + sess.user + "','" + date + "','" + deadline + "'," + cart.length + ",1)";
+        var sql = "INSERT INTO borrow_list (borrower_id, date,deadline,qty) VALUES ('" + sess.user + "','" + date + "','" + deadline + "'," + cart.length + ")";
         libDB.query(sql, function (err, result) {
             if (err) throw err;
             console.log("1 record inserted");
@@ -270,7 +288,7 @@ app.get("/checkOut", function (req, res) {
                 if (err) throw err;
                 // destroy session  
                 console.log()
-                res.redirect("/")
+                res.redirect("/borrowList")
             });
 
 
@@ -284,6 +302,15 @@ app.get("/clearCart", function (req, res) {
     sess = req.session
     sess.cart = []
     res.redirect("/")
+})
+app.get("/detail/:book_id",function(req,res){
+    var sql = 'SELECT * FROM book where book_id = "'+req.params.book_id+'"'
+    libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
+    console.log(results)
+    res.render("detail",{
+        results:results[0]
+    })
+    })
 })
 app.listen('3000', () => {     // 
     console.log('start port 3000')

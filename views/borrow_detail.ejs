@@ -1,4 +1,12 @@
 <% include ./partials/header%>
+<script>
+    function toggle(source) {
+        checkboxes = document.getElementsByName('book_id');
+        for (var i = 0, n = checkboxes.length; i < n; i++) {
+            checkboxes[i].checked = source.checked;
+        }
+    }
+</script>
 
 <body>
     <!-- Nav tabs -->
@@ -26,7 +34,9 @@
                     <% }); %>
                 </tbody>
             </table>
-            <input type="submit" value="return">
+            <input type="submit" class="btn btn-primary" value="return">
+                <input type="checkbox" class="styled" onClick="toggle(this)" />Approve All<br />
+
         </form>
     </div>
 </body>

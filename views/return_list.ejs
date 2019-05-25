@@ -7,20 +7,21 @@
         <table class="table paginated">
             <thead>
                 <tr>
-                    <th>borrow_id</th>
+                    <th>return_id</th>
                     <th>date</th>
                     <th>qty</th>
-                    <th>penalty</th>
                 </tr>
             </thead>
             <tbody>
                 <% results.forEach(function(result) { %>
                 <tr>
-                    <td><a href="/returnDetail/<%=result.return_id%>" class="btn btn-primary btn-sm"><%= result.return_id %></a> </td>
+                    <td>
+                        <div class="col text-center"> 
+                            <a href="/returnDetail/<%=result.return_id%>" class="btn btn-primary btn-sm"><span class="badge badge-warning"><%= result.return_id %></span> | show detail</a>
+                        </div>
+                     </td>
                     <td><%= result.return_date %></td>
                     <td><%= result.qty %></td>
-                    <td><%= result.penalty %></td>
-
                 </tr>
                 <% }); %>
             </tbody>

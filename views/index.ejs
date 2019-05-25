@@ -11,6 +11,7 @@
                         <option value="name">ชื่อหนังสือ</option>
                         <option value="category">ประเภท</option>
                         <option value="author">ผู้แต่ง</option>
+                        <option value="year_publish">ปีที่พิมพ์</option>
                     </select>
                     <input type="text" name="keyword">
                     <input type="submit" class="btn btn-primary" value="search">
@@ -35,7 +36,7 @@
                     <td><%= result.category %></td>
                     <td><%= result.author %></td>
                     <td><%= result.year_publish %></td>
-                    <td><a href="" class="btn btn-primary btn-sm">more</a></td>
+                    <td><a href="/detail/<%=result.book_id%>" class="btn btn-primary btn-sm">more</a></td>
                     <td><a href="/addCart/<%=result.book_id%>" class="btn btn-success btn-sm">Add</a></td>
                 </tr>
                 <% }); %>

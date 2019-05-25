@@ -4,22 +4,22 @@
     <!-- Nav tabs -->
     <% include ./partials/navbar%>
     <div class="container ">
-        <table class="table paginated">
+        <br>
+        <a href="/clearCart" class="btn btn-danger">Clear</a>
+        <a href="/checkOut" class="btn btn-primary">CheckOut</a>
+                                                                                                                                <table class="table paginated">
             <thead>
                 <tr>
-                    <th>borrow_id</th>
-                    <th>date</th>
-                    <th>deadline</th>
-                    <th>qty</th>
+                    <th>book_id</th>
+                    <th>name</th>
                 </tr>
             </thead>
             <tbody>
                 <% results.forEach(function(result) { %>
                 <tr>
-                    <td><a href="/borrowDetail/<%=result.borrow_id%>" class="btn btn-primary btn-sm"><span class="badge badge-warning"><%= result.borrow_id %></span> | show detail</a>
-                    <td><%= result.date %></td>
-                    <td><%= result.deadline %></td>
-                    <td><%= result.qty %></td>
+                    <td><%= result.book_id %></td>
+                    <td><%= result.name %></td>
+
                 </tr>
                 <% }); %>
             </tbody>

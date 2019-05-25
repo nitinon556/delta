@@ -1,0 +1,33 @@
+<% include ./partials/header%>
+
+
+<div class = "container">
+    <table>
+        <thead>
+            <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Author</th>
+                    <th>YearPublish</th>
+                    <th>publisher</th>
+                    <th>Position</th>
+                    <th>print time</th>
+            </tr>
+        </thead>
+        <tbody>
+                <tr>
+                        <td><%= results.name %></td>
+                        <td><%= results.category %></td>
+                        <td><%= results.author %></td>
+                        <td><%= results.year_publish %></td>
+                        <td><%= results.publisher %></td>
+                        <td><%= results.position %></td>
+                        <td><%= results.print_time %></td>
+                </tr>
+        </tbody>
+    </table>
+    <div class="col text-center">
+        <a href="/" class="btn btn-primary">Back</a>
+      </div>
+ 
+</div>
