@@ -108,7 +108,7 @@ app.get('/returnList', function (req, res) {
 app.get("/returnDetail/:return_id", function (req, res) {
     sess = req.session
     if (sess.user) {
-        var sql = "SELECT book_id,name,status from book where book_id IN (SELECT book_id FROM return_detail where return_id=" + req.params.borrow_id +")"
+        var sql = "SELECT book_id,name,status from book where book_id IN (SELECT book_id FROM return_detail where return_id=" + req.params.return_id +")"
         libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
             if (err) throw err  // ดัก error
             res.render("return_detail", {

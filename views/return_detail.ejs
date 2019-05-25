@@ -4,13 +4,12 @@
     <!-- Nav tabs -->
     <% include ./partials/navbar%>
     <div class="container ">
-        <p>borrow id: <%=borrow_id%></p>
+        <p>return id: <%=return_id%></p>
         <table class="table ">
             <thead>
                 <tr>
                     <th>book_id</th>
                     <th>book</th>
-                    <th>status</th>
                 </tr>
             </thead>
             <tbody>
@@ -18,13 +17,11 @@
                 <tr>
                     <td><%= result.book_id %></td>
                     <td><%= result.name %></td>
-                    <td><%= result.status %></td>
                 </tr>
                 <% }); %>
             </tbody>
         </table>
-        <input type="submit" value="return">
-    </div>
+     </div>
 </body>
 
 </html>
