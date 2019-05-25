@@ -5,19 +5,19 @@
     <% include ./partials/navbar%>
     <div class="container">
         <br>
-        <div class = "row d-flex justify-content-center">
-                <form action="/search" method="POST">
-                    <select name="searchOp">
-                        <option value="name">ชื่อหนังสือ</option>
-                        <option value="category">ประเภท</option>
-                        <option value="author">ผู้แต่ง</option>
-                        <option value="year_publish">ปีที่พิมพ์</option>
-                    </select>
-                    <input type="text" name="keyword">
-                    <input type="submit" class="btn btn-primary" value="search">
-                </form>
+        <div class="row d-flex justify-content-center">
+            <form action="/search" method="POST">
+                <select name="searchOp">
+                    <option value="name">ชื่อหนังสือ</option>
+                    <option value="category">ประเภท</option>
+                    <option value="author">ผู้แต่ง</option>
+                    <option value="year_publish">ปีที่พิมพ์</option>
+                </select>
+                <input type="text" name="keyword">
+                <input type="submit" class="btn btn-primary" value="search">
+            </form>
         </div>
-       
+
         <table class="table paginated">
             <thead>
                 <tr>
@@ -26,21 +26,34 @@
                     <th>Author</th>
                     <th>YearPublish</th>
                     <th>Detail</th>
+                    <%if(user!="admin"){%>
                     <th>Add</th>
+                    <%}else{%>
+                    <th>status</th>
+                    <%}%>
                 </tr>
             </thead>
             <tbody>
                 <% results.forEach(function(result) { %>
                 <tr>
-                    <td class="text-danger"><%= result.name %> </td>
+                    <td class=""><%= result.name %> </td>
                     <td><%= result.category %></td>
                     <td><%= result.author %></td>
                     <td><%= result.year_publish %></td>
                     <td><a href="/detail/<%=result.book_id%>" class="btn btn-primary btn-sm">more</a></td>
+                    <%if(user!="admin"){%>
                     <td><a href="/addCart/<%=result.book_id%>" class="btn btn-success btn-sm">Add</a></td>
+                    <%}else{%>
+                    <%if(result.status==0){%>
+                    <td class="text-success text-bold font-weight-bold">Available</td>
+                    <%}else{%>
+                    <td class="text-danger text-bold font-weight-bold">Unavailable</td>
+                    <%}%>
+                    <%}%>
+
                 </tr>
                 <% }); %>
-            </tbody>
+                </tbody>
         </table>
 
     </div>

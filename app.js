@@ -37,12 +37,15 @@ app.get('/', function (req, res) {   // Router เวลาเรียกใช
 })
 app.get('/home', function (req, res) {
     sess = req.session
+    console.log(sess.user)
     if (sess.user) {
-        console.log(sess.cart)
-        var sql = 'SELECT * FROM book where status=0'  // คำสั่ง sql
+        var sql = 'SELECT * FROM book'  // คำสั่ง sql
+        if (sess.user != "admin") sql += ' where status=0'
+        console.log(sql)
         libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
-            if (err) throw err  // ดัก error
-            var a = results
+            if (err) throw err  // ดัก error'
+
+
             res.render("index", {
                 results: results,
                 user: sess.user,
@@ -58,14 +61,23 @@ app.get('/borrowList', function (req, res) {
     sess = req.session
     if (sess.user) {
         console.log(sess.cart)
-        var sql = 'SELECT * FROM borrow_list where borrower_id="' + sess.user + '" and qty!=0 order by borrow_id desc' // คำสั่ง sql
+        var sql = 'SELECT * FROM borrow_list ' // คำสั่ง sql
+        if (sess.user != "admin") sql += 'where borrower_id="' + sess.user + '" and qty!=0 order by borrow_id desc'
+        else sql+= ' order by borrow_id desc'
         libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
             if (err) throw err  // ดัก error
-            res.render("borrow_list", {
-                results: results,
-                user: sess.user,
-                cart: sess.cart.length
-            })
+            if (sess.user == "admin") {
+                res.render("borrow_list", {
+                    results: results,
+                    user: sess.user,
+                })
+            } else {
+                res.render("borrow_list", {
+                    results: results,
+                    user: sess.user,
+                    cart: sess.cart.length
+                })
+            }
         })
     } else {
         res.redirect("/")
@@ -74,15 +86,26 @@ app.get('/borrowList', function (req, res) {
 app.get("/borrowDetail/:borrow_id", function (req, res) {
     sess = req.session
     if (sess.user) {
-        var sql = "SELECT book_id,name,status from book where book_id IN (SELECT book_id FROM borrow_detail where borrow_id=" + req.params.borrow_id + " and status=0)"
+        if (sess.user != "admin") aa = " and status=0"
+        else aa=""
+        var sql = "SELECT book_id,name,status from book where book_id IN (SELECT book_id FROM borrow_detail where borrow_id=" + req.params.borrow_id + aa + ")"
         libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
             if (err) throw err  // ดัก error
-            res.render("borrow_detail", {
-                borrow_id: req.params.borrow_id,
-                results: results,
-                user: sess.user,
-                cart: sess.cart.length
-            })
+            if (sess.user == "admin") {
+                res.render("borrow_detail", {
+                    borrow_id: req.params.borrow_id,
+                    results: results,
+                    user: sess.user,
+                })
+            } else {
+                res.render("borrow_detail", {
+                    borrow_id: req.params.borrow_id,
+                    results: results,
+                    user: sess.user,
+                    cart: sess.cart.length
+                })
+            }
+
         })
     }
 })
@@ -91,15 +114,25 @@ app.get('/returnList', function (req, res) {
     sess = req.session
     if (sess.user) {
         console.log(sess.cart)
-        var sql = 'SELECT * FROM return_list where borrower_id="' + sess.user + '" order by return_id desc'// คำสั่ง sql
+        var sql = 'SELECT * FROM return_list '// คำสั่ง sql
+        if (sess.user != "admin") sql += 'where borrower_id="' + sess.user + '" order by return_id desc'
+        else sql+=' order by return_id desc'
         libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
             console.log(results)
             if (err) throw err  // ดัก error
-            res.render("return_list", {
-                results: results,
-                user: sess.user,
-                cart: sess.cart.length
-            })
+            if (sess.user == "admin") {
+                res.render("return_list", {
+                    results: results,
+                    user: sess.user,
+                })
+            } else {
+                res.render("return_list", {
+                    results: results,
+                    user: sess.user,
+                    cart: sess.cart.length
+                })
+            }
+
         })
     } else {
         res.redirect("/")
@@ -199,25 +232,31 @@ app.post("/search", function (req, res) {
 app.post("/login", function (req, res) {
     sess = req.session
     sess.cart = []
-    var sql = 'SELECT IdentificationID FROM student where UID=' + req.body.username + ' ' //sql query 
-    regDB.query(sql, function (err, results) {
-        var user = results[0]
-        console.log(user.IdentificationID)
-        console.log(user.UID)
-
-        if (user) {
-            if (user.IdentificationID == req.body.password) {
-                sess.user = req.body.username
-                res.redirect("/home")
+    if (req.body.username == "admin" && req.body.password == "naizaa") {
+        sess.user = "admin"
+        res.redirect("/home")
+    } else {
+        var sql = 'SELECT * FROM student s,student_reg r where s.UID=' + req.body.username + ' and r.UID=s.UID ' //sql query 
+        regDB.query(sql, function (err, results) {
+            var user = results[0]
+            if (user) {
+                if (user.IdentificationID == req.body.password&&user.Payment_Status==1) {
+                    sess.user = req.body.username
+                    res.redirect("/home")
+                }else
+                if(user.Payment_Status==0){
+                    res.send("please pay!!!")
+                }
+                else {
+                    console.log("wrong password")
+                    res.redirect("/")
+                }
             } else {
-                console.log("wrong password")
+                console.log("user not found")
                 res.redirect("/")
             }
-        } else {
-            console.log("user not found")
-            res.redirect("/")
-        }
-    })
+        })
+    }
 })
 app.get("/logout", function (req, res) {
     req.session.destroy(function (err) {
@@ -230,9 +269,9 @@ app.get("/logout", function (req, res) {
 // -------------------------about cart ---------------------------------
 app.get('/cart', function (req, res) {
     sess = req.session
-    if (sess.user&&sess.cart.length!=0) {
+    if (sess.user && sess.cart.length != 0) {
         console.log(sess.cart)
-        var sql = "SELECT * FROM book where book_id IN "+ "(" + sess.cart + ")";
+        var sql = "SELECT * FROM book where book_id IN " + "(" + sess.cart + ")";
         libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
             if (err) throw err  // ดัก error
             res.render("cart", {
@@ -306,13 +345,13 @@ app.get("/clearCart", function (req, res) {
     sess.cart = []
     res.redirect("/")
 })
-app.get("/detail/:book_id",function(req,res){
-    var sql = 'SELECT * FROM book where book_id = "'+req.params.book_id+'"'
+app.get("/detail/:book_id", function (req, res) {
+    var sql = 'SELECT * FROM book where book_id = "' + req.params.book_id + '"'
     libDB.query(sql, function (err, results) { // สั่ง Query คำสั่ง sql
-    console.log(results)
-    res.render("detail",{
-        results:results[0]
-    })
+        console.log(results)
+        res.render("detail", {
+            results: results[0]
+        })
     })
 })
 app.listen('3000', () => {     // 

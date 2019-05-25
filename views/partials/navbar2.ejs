@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-sm navbar-dark bg-success">
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
     <!-- Links -->
     <div class="container">
         <div>
@@ -7,16 +7,11 @@
                     <a href="/" class="navbar-brand ">Delta library</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/" class="nav-link">username: <%=user%></a>
+                    <a href="/" class="nav-link">Admin</a>
                 </li>
         </div>
         <div>
             <ul class="navbar-nav ml-auto">
-                <%if(user!="admin"){%>
-                <li class="nav-item">
-                    <a href="/cart" class="nav-link">cart <span class="badge badge-warning"><%=cart%></span></a>
-                </li>
-                <%}%>
                 <li class="nav-item">
                     <a href="/borrowList" class="nav-link">borrow_list</a>
                 </li>

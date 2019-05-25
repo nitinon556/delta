@@ -8,9 +8,6 @@
             <thead>
                 <tr>
                     <th>borrow_id</th>
-                    <%if(user=="admin"){%>
-                    <th>borrower id</th>
-                    <%}%>
                     <th>date</th>
                     <th>deadline</th>
                     <th>qty</th>
@@ -19,17 +16,13 @@
             <tbody>
                 <% results.forEach(function(result) { %>
                 <tr>
-                    <td><a href="/borrowDetail/<%=result.borrow_id%>" class="btn btn-primary btn-sm"><span
-                                class="badge badge-warning"><%= result.borrow_id %></span> | show detail</a>
-                    <%if(user=="admin"){%>
-                    <td><%=result.borrower_id%></td>
-                    <%}%>
+                    <td><a href="/borrowDetail/<%=result.borrow_id%>" class="btn btn-primary btn-sm"><span class="badge badge-warning"><%= result.borrow_id %></span> | show detail</a>
                     <td><%= result.date %></td>
                     <td><%= result.deadline %></td>
                     <td><%= result.qty %></td>
                 </tr>
                 <% }); %>
-                </tbody>
+            </tbody>
         </table>
 
     </div>

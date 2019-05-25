@@ -20,9 +20,7 @@
                         <th>book_id</th>
                         <th>book</th>
                         <th>status</th>
-                        <%if(user!="admin"){%>
                         <th>select</th>
-                        <%}%>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,17 +29,14 @@
                         <td><%= result.book_id %></td>
                         <td><%= result.name %></td>
                         <td><%= result.status %></td>
-                        <%if(user!="admin"){%>
                         <td><input type="checkbox" name="book_id" value="<%=result.book_id%>"></td>
-                        <%}%>
                     </tr>
                     <% }); %>
-                        </tbody>
+                </tbody>
             </table>
-            <%if(user!="admin"){%>
             <input type="submit" class="btn btn-primary" value="return">
-            <input type="checkbox" class="styled" onClick="toggle(this)" />Approve All<br />
-            <%}%>
+                <input type="checkbox" class="styled" onClick="toggle(this)" />Approve All<br />
+
         </form>
     </div>
 </body>
