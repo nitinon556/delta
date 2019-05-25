@@ -199,11 +199,14 @@ app.post("/search", function (req, res) {
 app.post("/login", function (req, res) {
     sess = req.session
     sess.cart = []
-    var sql = 'SELECT password FROM student where student_id="' + req.body.username + '" ' //sql query 
+    var sql = 'SELECT IdentificationID FROM student where UID=' + req.body.username + ' ' //sql query 
     regDB.query(sql, function (err, results) {
         var user = results[0]
+        console.log(user.IdentificationID)
+        console.log(user.UID)
+
         if (user) {
-            if (user.password == req.body.password) {
+            if (user.IdentificationID == req.body.password) {
                 sess.user = req.body.username
                 res.redirect("/home")
             } else {
